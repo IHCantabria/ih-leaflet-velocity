@@ -1,27 +1,25 @@
-# leaflet-velocity [![NPM version][npm-image]][npm-url] [![NPM Downloads][npm-downloads-image]][npm-url]
+# IH-Leaflet-Velocity
 
-## Version 2 Notice
+This is a fork of [leaflet-velocity](https://github.com/onaci/leaflet-velocity), a Leaflet plugin for visualizing directional and intensity layers of arbitrary velocities (e.g., wind or ocean currents).
 
-As of version 2, `leaflet-velocity` is now under [CSIRO](https://www.csiro.au)'s [Open Source Software Licence Agreement](LICENSE.md), which is variation of the BSD / MIT License.
+## 🔄 Differences from the Original Repository
 
-There are no other plans for changes to licensing, and the project will remain open source.
+This fork introduces the following modifications compared to the original repository:
 
----
+- New waves representation
+- Update Control.Velocity to support wave parameters
+- Update dependencies
 
-A plugin for Leaflet (v1.0.3, and v0.7.7) to create a canvas visualisation layer for direction and intensity of arbitrary velocities (e.g. wind, ocean current).
+## ✨ Usage
 
-Live Demo: https://onaci.github.io/leaflet-velocity/
+To use this fork:
 
-- Uses a modified version of [WindJS](https://github.com/Esri/wind-js) for core functionality.
-- Similar to [wind-js-leaflet](https://github.com/danwild/wind-js-leaflet), however much more versatile (provides a generic leaflet layer, and not restricted to wind).
-- Data input format is the same as output by [wind-js-server](https://github.com/danwild/wind-js-server), using [grib2json](https://github.com/cambecc/grib2json).
+Download the [dist](https://github.com/IHCantabria/ih-leaflet-velocity/tree/main/dist) content in your project and import leaflet-velocity.js and leaflet.velocity.css (or min. versions)
 
-![Screenshot](/screenshots/velocity.gif?raw=true)
-
-## Example use:
+Basic example:
 
 ```javascript
-var velocityLayer = L.velocityLayer({
+const velocityLayer = L.velocityLayer({
   displayValues: true,
   displayOptions: {
     // label prefix
@@ -85,22 +83,20 @@ It can be `m/s` for meter per second, `k/h` for kilometer per hour or `kt` for k
 npm run watch
 ```
 
-## Reference
+## 📚 License and Credits
 
-`leaflet-velocity` is possible because of things like:
+This project is a fork of [leaflet-velocity](https://github.com/onaci/leaflet-velocity), originally developed by [onaci](https://github.com/onaci) under the [CSIRO Open Source Software Licence Agreement](LICENSE.md), a variation of the BSD/MIT license.
+
+The code also includes components licensed under MIT, such as:
 
 - [L.CanvasOverlay.js](https://gist.github.com/Sumbera/11114288)
 - [WindJS](https://github.com/Esri/wind-js)
 - [earth](https://github.com/cambecc/earth)
 
-## Example data
+See the [LICENSE](LICENSE.md) file for more details on the terms of use.
 
-Data shown for the Great Barrier Reef has been derived from [CSIRO's eReefs products](https://research.csiro.au/ereefs/)
+## 📈 Contributions
 
-## License
+This fork is open to contributions. If you would like to suggest improvements or report issues, feel free to open an issue or submit a pull request.
 
-CSIRO Open Source Software Licence Agreement (variation of the BSD / MIT License)
 
-[npm-image]: https://badge.fury.io/js/leaflet-velocity.svg
-[npm-url]: https://www.npmjs.com/package/leaflet-velocity
-[npm-downloads-image]: https://img.shields.io/npm/dt/leaflet-velocity.svg
