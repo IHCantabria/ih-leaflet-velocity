@@ -49,15 +49,15 @@ L.CanvasLayer = (L.Layer ? L.Layer : L.Class).extend({
   },
   //-------------------------------------------------------------
   _onLayerDidMove: function () {
-    var topLeft = this._map.containerPointToLayerPoint([0, 0]);
+    const topLeft = this._map.containerPointToLayerPoint([0, 0]);
     L.DomUtil.setPosition(this._canvas, topLeft);
     this.drawLayer();
   },
   //-------------------------------------------------------------
   getEvents: function () {
-    var events = {
+    const events = {
       resize: this._onLayerDidResize,
-      moveend: this._onLayerDidMove
+      zoomend: this._onLayerDidMove,
     };
     if (this._map.options.zoomAnimation && L.Browser.any3d) {
       events.zoomanim = this._animateZoom;
@@ -71,11 +71,11 @@ L.CanvasLayer = (L.Layer ? L.Layer : L.Class).extend({
     this._canvas = L.DomUtil.create("canvas", "leaflet-layer");
     this.tiles = {};
 
-    var size = this._map.getSize();
+    const size = this._map.getSize();
     this._canvas.width = size.x;
     this._canvas.height = size.y;
 
-    var animated = this._map.options.zoomAnimation && L.Browser.any3d;
+    const animated = this._map.options.zoomAnimation && L.Browser.any3d;
     L.DomUtil.addClass(
       this._canvas,
       "leaflet-zoom-" + (animated ? "animated" : "hide")
@@ -84,11 +84,11 @@ L.CanvasLayer = (L.Layer ? L.Layer : L.Class).extend({
     this.options.pane.appendChild(this._canvas);
     map.on(this.getEvents(), this);
 
-    var del = this._delegate || this;
+    const del = this._delegate || this;
     del.onLayerDidMount && del.onLayerDidMount(); // -- callback
     this.needRedraw();
 
-    var self = this;
+    const self = this;
     setTimeout(function () {
       self._onLayerDidMove();
     }, 0);
@@ -96,7 +96,7 @@ L.CanvasLayer = (L.Layer ? L.Layer : L.Class).extend({
 
   //-------------------------------------------------------------
   onRemove: function (map) {
-    var del = this._delegate || this;
+    const del = this._delegate || this;
     del.onLayerWillUnmount && del.onLayerWillUnmount(); // -- callback
     this.options.pane.removeChild(this._canvas);
     map.off(this.getEvents(), this);
@@ -112,16 +112,16 @@ L.CanvasLayer = (L.Layer ? L.Layer : L.Class).extend({
   //------------------------------------------------------------------------------
   drawLayer: function () {
     // -- todo make the viewInfo properties  flat objects.
-    var size = this._map.getSize();
-    var bounds = this._map.getBounds();
-    var zoom = this._map.getZoom();
+    const size = this._map.getSize();
+    const bounds = this._map.getBounds();
+    const zoom = this._map.getZoom();
 
-    var center = this._map.options.crs.project(this._map.getCenter());
-    var corner = this._map.options.crs.project(
+    const center = this._map.options.crs.project(this._map.getCenter());
+    const corner = this._map.options.crs.project(
       this._map.containerPointToLatLng(this._map.getSize())
     );
 
-    var del = this._delegate || this;
+    const del = this._delegate || this;
     del.onDrawLayer &&
       del.onDrawLayer({
         layer: this,
@@ -137,7 +137,7 @@ L.CanvasLayer = (L.Layer ? L.Layer : L.Class).extend({
   // -- L.DomUtil.setTransform from leaflet 1.0.0 to work on 0.0.7
   //------------------------------------------------------------------------------
   _setTransform: function (el, offset, scale) {
-    var pos = offset || new L.Point(0, 0);
+    const pos = offset || new L.Point(0, 0);
 
     el.style[L.DomUtil.TRANSFORM] =
       (L.Browser.ie3d
@@ -148,9 +148,9 @@ L.CanvasLayer = (L.Layer ? L.Layer : L.Class).extend({
 
   //------------------------------------------------------------------------------
   _animateZoom: function (e) {
-    var scale = this._map.getZoomScale(e.zoom);
+    const scale = this._map.getZoomScale(e.zoom);
     // -- different calc of offset in leaflet 1.0.0 and 0.0.7 thanks for 1.0.0-rc2 calc @jduggan1
-    var offset = L.Layer
+    const offset = L.Layer
       ? this._map._latLngToNewLayerPoint(
         this._map.getBounds().getNorthWest(),
         e.zoom,

@@ -1,3 +1,4 @@
+let coordinateCache = {};
 L.VelocityLayer = (L.Layer ? L.Layer : L.Class).extend({
   options: {
     displayValues: true,
@@ -8,7 +9,8 @@ L.VelocityLayer = (L.Layer ? L.Layer : L.Class).extend({
     },
     maxVelocity: 10, // used to align color scale
     colorScale: null,
-    data: null
+    data: null,
+    waveMode: false, // if true, transform particles shape to waves style
   },
 
   _map: null,
@@ -79,10 +81,7 @@ L.VelocityLayer = (L.Layer ? L.Layer : L.Class).extend({
   },
 
   /*------------------------------------ PRIVATE ------------------------------------------*/
-
-  onDrawLayer: function(overlay, params) {
-    var self = this;
-
+  onDrawLayer: function onDrawLayer(overlay, params) {
     if (!this._windy) {
       this._initWindy(this);
       return;
@@ -93,15 +92,12 @@ L.VelocityLayer = (L.Layer ? L.Layer : L.Class).extend({
     }
 
     if (this._timer) clearTimeout(self._timer);
-
-    this._timer = setTimeout(function() {
-      self._startWindy();
-    }, 750); // showing velocity is delayed
+    this._timer = setTimeout(this._clearAndRestart.bind(this), 150); // showing velocity is delayed
   },
 
   _startWindy: function() {
-    var bounds = this._map.getBounds();
-    var size = this._map.getSize();
+    const bounds = this._map.getBounds();
+    const size = this._map.getSize();
 
     // bounds, width, height, extent
     this._windy.start(
@@ -131,10 +127,12 @@ L.VelocityLayer = (L.Layer ? L.Layer : L.Class).extend({
     this._canvasLayer._canvas.classList.add("velocity-overlay");
     this.onDrawLayer();
 
-    this._map.on("dragstart", self._windy.stop);
-    this._map.on("dragend", self._clearAndRestart);
+
     this._map.on("zoomstart", self._windy.stop);
-    this._map.on("zoomend", self._clearAndRestart);
+    this._map.on("zoomend", () => {
+      coordinateCache = {};
+      return self._clearAndRestart();
+    });
     this._map.on("resize", self._clearWind);
 
     this._initMouseHandler(false);
@@ -146,9 +144,11 @@ L.VelocityLayer = (L.Layer ? L.Layer : L.Class).extend({
       this._mouseControl = false;
     }
     if (!this._mouseControl && this.options.displayValues) {
-      var options = this.options.displayOptions || {};
+      const options = this.options.displayOptions || {};
       options["leafletVelocity"] = this;
-      this._mouseControl = L.control.velocity(options).addTo(this._map);
+      this._mouseControl = L.control
+        .velocity({ ...options, waveMode: this.options.waveMode })
+        .addTo(this._map);
     }
   },
 

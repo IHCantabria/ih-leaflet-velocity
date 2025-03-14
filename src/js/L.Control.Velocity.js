@@ -8,10 +8,13 @@ L.Control.Velocity = L.Control.extend({
     showCardinal: false,
     // Could be 'm/s' for meter per second, 'k/h' for kilometer per hour, 'mph' for miles per hour or 'kt' for knots
     speedUnit: "m/s",
+    heightUnit: "m",
     directionString: "Direction",
     speedString: "Speed",
+    heightString: "Height",
     onAdd: null,
-    onRemove: null
+    onRemove: null,
+    waveMode: false,
   },
 
   onAdd: function(map) {
@@ -19,8 +22,7 @@ L.Control.Velocity = L.Control.extend({
     L.DomEvent.disableClickPropagation(this._container);
     map.on("mousemove", this._onMouseMove, this);
     this._container.innerHTML = this.options.emptyString;
-    if (this.options.leafletVelocity.options.onAdd)
-      this.options.leafletVelocity.options.onAdd();
+    this.options.leafletVelocity?.options?.onAdd?.();
     return this._container;
   },
 
@@ -31,7 +33,7 @@ L.Control.Velocity = L.Control.extend({
   },
 
   vectorToSpeed: function(uMs, vMs, unit) {
-    var velocityAbs = Math.sqrt(Math.pow(uMs, 2) + Math.pow(vMs, 2));
+    const velocityAbs = Math.sqrt(Math.pow(uMs, 2) + Math.pow(vMs, 2));
     // Default is m/s
     if (unit === "k/h") {
       return this.meterSec2kilometerHour(velocityAbs);
@@ -43,17 +45,20 @@ L.Control.Velocity = L.Control.extend({
       return velocityAbs;
     }
   },
-
-  vectorToDegrees: function(uMs, vMs, angleConvention) {
+  vectorToDegrees: function (uMs, vMs, angleConvention) {
     // Default angle convention is CW
     if (angleConvention.endsWith("CCW")) {
       // vMs comes out upside-down..
-      vMs = vMs > 0 ? (vMs = -vMs) : Math.abs(vMs);
+      if (vMs > 0) {
+        vMs = -vMs;
+      } else {
+        vMs = Math.abs(vMs);
+      }
     }
-    var velocityAbs = Math.sqrt(Math.pow(uMs, 2) + Math.pow(vMs, 2));
 
-    var velocityDir = Math.atan2(uMs / velocityAbs, vMs / velocityAbs);
-    var velocityDirToDegrees = (velocityDir * 180) / Math.PI + 180;
+    const velocityAbs = Math.sqrt(Math.pow(uMs, 2) + Math.pow(vMs, 2));
+    const velocityDir = Math.atan2(uMs / velocityAbs, vMs / velocityAbs);
+    let velocityDirToDegrees = (velocityDir * 180) / Math.PI + 180;
 
     if (angleConvention === "bearingCW" || angleConvention === "meteoCCW") {
       velocityDirToDegrees += 180;
@@ -131,32 +136,55 @@ L.Control.Velocity = L.Control.extend({
   },
 
   _onMouseMove: function(e) {
-    var self = this;
-    var pos = this.options.leafletVelocity._map.containerPointToLatLng(
+    const self = this;
+    const pos = this.options.leafletVelocity._map.containerPointToLatLng(
       L.point(e.containerPoint.x, e.containerPoint.y)
     );
-    var gridValue = this.options.leafletVelocity._windy.interpolatePoint(
+    const gridValue = this.options.leafletVelocity._windy.interpolatePoint(
       pos.lng,
       pos.lat
     );
-    var htmlOut = "";
+    let htmlOut = "";
+
 
     if (
       gridValue &&
       !isNaN(gridValue[0]) &&
-      !isNaN(gridValue[1]) &&
-      gridValue[2]
+      !isNaN(gridValue[1]) 
     ) {
-    var deg = self.vectorToDegrees(gridValue[0], gridValue[1], this.options.angleConvention);
-    var cardinal = this.options.showCardinal ? ` (${self.degreesToCardinalDirection(deg)}) ` : '';
+      const deg = self.vectorToDegrees(
+        gridValue[0],
+        gridValue[1],
+        this.options.angleConvention,
+      );
+      const cardinal = this.options.showCardinal
+        ? " (".concat(self.degreesToCardinalDirection(deg), ") ")
+        : "";
 
-		htmlOut = `<strong> ${this.options.velocityType} ${
-			this.options.directionString
-		}: </strong> ${deg.toFixed(2)}°${cardinal}, <strong> ${this.options.velocityType} ${
-			this.options.speedString
-		}: </strong> ${self
-			.vectorToSpeed(gridValue[0], gridValue[1], this.options.speedUnit)
-			.toFixed(2)} ${this.options.speedUnit}`;
+      let variableOutput = "";
+      let labelString = "";
+      let unit = "";
+      if (this.options.waveMode) {
+        variableOutput = gridValue[2] ? gridValue[2].toFixed(2) : "No data";
+        labelString = this.options.heightString;
+        unit = gridValue[2] ? this.options.heightUnit : "";
+      } else {
+        variableOutput = self
+          .vectorToSpeed(gridValue[0], gridValue[1], this.options.speedUnit)
+          .toFixed(2);
+        labelString = this.options.speedString;
+        unit = this.options.speedUnit
+      }
+
+      htmlOut = ""
+          .concat("<strong> ")
+          .concat(this.options.velocityType, ": ")
+          .concat(this.options.directionString, ": </strong> ")
+          .concat(deg.toFixed(2), "\xB0")
+          .concat(cardinal, ", <strong> ")
+          .concat(labelString, ": </strong> ")
+          .concat(variableOutput, " ")
+          .concat(unit);
     } else {
       htmlOut = this.options.emptyString;
     }
