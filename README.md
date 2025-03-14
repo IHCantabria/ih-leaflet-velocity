@@ -2,6 +2,8 @@
 
 This is a fork of [leaflet-velocity](https://github.com/onaci/leaflet-velocity), a Leaflet plugin for visualizing directional and intensity layers of arbitrary velocities (e.g., wind or ocean currents).
 
+![Screenshot](/screenshots/velocity.gif?raw=true)
+
 ## 🔄 Differences from the Original Repository
 
 This fork introduces the following modifications compared to the original repository:
@@ -9,6 +11,8 @@ This fork introduces the following modifications compared to the original reposi
 - New waves representation
 - Update Control.Velocity to support wave parameters
 - Update dependencies
+
+![Screenshot](/screenshots/waves-velocity.gif?raw=true)
 
 ## ✨ Usage
 
@@ -40,11 +44,17 @@ const velocityLayer = L.velocityLayer({
     // one of: ['ms', 'k/h', 'mph', 'kt']
     speedUnit: "ms",
 
+    // unit for waves visualization
+    heightUnit: "m"
+
     // direction label prefix
     directionString: "Direction",
 
     // speed label prefix
     speedString: "Speed",
+
+    // height label prefix
+    heightString: "Height"
   },
   data: data, // see demo/*.json, or wind-js-server for example data service
 
@@ -60,6 +70,10 @@ const velocityLayer = L.velocityLayer({
   // optional pane to add the layer, will be created if doesn't exist
   // leaflet v1+ only (falls back to overlayPane for < v1)
   paneName: "overlayPane",
+
+  // WAVE MODE 🌊
+  waveMode: true // transform particles into waves
+  wavesParticlesSeparation: 3.5, // separation between wave particles
 });
 ```
 
@@ -69,6 +83,22 @@ and `CW` (angle value increases clock-wise) or `CCW` (angle value increases coun
 
 The speed unit option refers to the unit used to express the wind speed in the control.
 It can be `m/s` for meter per second, `k/h` for kilometer per hour or `kt` for knots. If not given defaults to `m/s`.
+
+
+# 🌊 Wave Mode Explanation
+
+When `waveMode` is enabled, the visualization adapts to represent waves instead of standard velocity particles. This means:
+
+- **Particle Behavior**:  
+  The particles move according to the provided velocity data, but their representation changes to mimic wave shapes instead of individual velocity particles.
+
+- **Wave Height Representation**:  
+  If the data array contains a third parameter with wave height information, the waves will be rendered with different sizes and colors according to their height.
+
+- **Control Display**:  
+  The height of the waves will be displayed in the control, allowing users to visualize the intensity of the swell.
+
+
 
 ## Public methods
 
