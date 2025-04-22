@@ -1,4 +1,10 @@
-# IH-Leaflet-Velocity
+# IH-Leaflet-Velocity  [Archived] [DEPRECATED]
+
+## IMPORTANT
+
+This repository has been replaced by [ih-leaflet-velocity-ts](https://github.com/IHCantabria/ih-leaflet-velocity-ts)
+
+## REPO INFO
 
 This is a fork of [leaflet-velocity](https://github.com/onaci/leaflet-velocity), a Leaflet plugin for visualizing directional and intensity layers of arbitrary velocities (e.g., wind or ocean currents).
 
